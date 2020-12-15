@@ -13,8 +13,9 @@ def get_lyrics(artist, song_title):
     artist = artist.lower() 
     song_title = song_title.lower() 
     # remove all except alphanumeric characters from artist and song_title 
-    artist = re.sub('[^A-Za-z0-9]+', "", artist) 
+    artist = re.sub('[^A-Za-z0-9]+', "", artist).replace('Official','').replace('Music','').replace('VEVO','')
     song_title = re.sub('[^A-Za-z0-9]+', "", song_title) 
+    song_title = re.sub(artist, "", song_title)
     if artist.startswith("the"):    # remove starting 'the' from artist e.g. the who -> who 
         artist = artist[3:] 
     url = "http://azlyrics.com/lyrics/"+artist+"/"+song_title+".html" 
@@ -29,7 +30,7 @@ def get_lyrics(artist, song_title):
         down_partition = '<!-- MxM banner -->' 
         lyrics = lyrics.split(up_partition)[1] 
         lyrics = lyrics.split(down_partition)[0] 
-        lyrics = lyrics.replace('<br>','').replace('</br>','').replace('</div>','').strip() 
+        lyrics = lyrics.replace('<br>','').replace('</br>','').replace('<br/>','').replace('</div>','').strip() 
         return lyrics 
     except Exception as e: 
         return "Exception occurred \n" +str(e) 
