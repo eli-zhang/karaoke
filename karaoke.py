@@ -5,21 +5,24 @@ import youtube_dl
 import json
 import re 
 import urllib.request 
+import requests
 from bs4 import BeautifulSoup 
 from playsound import playsound
 
+
 # https://www.quora.com/Whats-a-good-API-to-use-to-get-song-lyrics
-def get_lyrics(artist, song_title): 
-    artist = artist.lower() 
-    song_title = song_title.lower() 
+def get_lyrics(song_title): 
     # remove all except alphanumeric characters from artist and song_title 
-    artist = re.sub('[^A-Za-z0-9]+', "", artist).replace('Official','').replace('Music','').replace('VEVO','')
-    song_title = re.sub('[^A-Za-z0-9]+', "", song_title) 
-    song_title = re.sub(artist, "", song_title)
-    if artist.startswith("the"):    # remove starting 'the' from artist e.g. the who -> who 
-        artist = artist[3:] 
-    url = "http://azlyrics.com/lyrics/"+artist+"/"+song_title+".html" 
-    print(url)
+    title = re.sub(' ', "+", song_title)
+    search_url = 'https://search.azlyrics.com/search.php?q={}'.format(title)
+    print(search_url)
+    page = requests.get(search_url)
+    try:
+        soup = BeautifulSoup(page.content, 'html.parser')
+        url = soup.find('td').find('a')['href']
+
+    except Exception as e: 
+        return "Exception occurred \n" + str(e) 
      
     try: 
         content = urllib.request.urlopen(url).read() 
@@ -41,7 +44,6 @@ while True:
     print('searching...')
     search = SearchVideos(name, offset = 1, mode = "json", max_results = 1)
     result = json.loads(search.result())['search_result'][0]
-    print(result)
     link = result['link']
     init_title = result['title']
     title = "".join([c for c in init_title if c.isalpha() or c.isdigit()]).rstrip()
@@ -62,6 +64,6 @@ while True:
         result = ydl.download([link])
 
     separator = Separator('spleeter:2stems')
-    separator.separate_to_file('./downloads/{}.mp3'.format(title), './'.format(title))
-    playsound('./{}/accompaniment.wav'.format(title), block=False)
-    print(get_lyrics(artist, title)) 
+    separator.separate_to_file('./downloads/{}.mp3'.format(title), './downloads/')
+    playsound('./downloads/{}/accompaniment.wav'.format(title), block=False)
+    print(get_lyrics(init_title)) 
