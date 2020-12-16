@@ -33,7 +33,7 @@ def get_lyrics(song_title):
         down_partition = '<!-- MxM banner -->' 
         lyrics = lyrics.split(up_partition)[1] 
         lyrics = lyrics.split(down_partition)[0] 
-        lyrics = lyrics.replace('<br>','').replace('</br>','').replace('<br/>','').replace('</div>','').strip() 
+        lyrics = lyrics.replace('<br>','').replace('</br>','').replace('<br/>','').replace('</div>','').replace('<i>','').replace('</i>','').strip() 
         return lyrics 
     except Exception as e: 
         return "Exception occurred \n" +str(e) 
@@ -66,4 +66,4 @@ while True:
     separator = Separator('spleeter:2stems')
     separator.separate_to_file('./downloads/{}.mp3'.format(title), './downloads/')
     playsound('./downloads/{}/accompaniment.wav'.format(title), block=False)
-    print(get_lyrics(init_title)) 
+    print(get_lyrics(name))
